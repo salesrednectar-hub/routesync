@@ -1,10 +1,5 @@
-const CACHE = 'routesync-v11';
-const STATIC = [
-  '/routesync/',
-  '/routesync/index.html',
-  '/routesync/manifest.json',
-  '/routesync/sw.js'
-];
+const CACHE = 'routesync-v12';
+const STATIC = ['./','./index.html','./manifest.json'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -22,7 +17,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (url.includes('googleapis.com') || url.includes('gstatic.com') ||
-      url.includes('firebase') || url.includes('fonts.')) return;
+      url.includes('firebasejs') || url.includes('fonts.')) return;
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
