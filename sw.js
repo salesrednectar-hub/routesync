@@ -1,5 +1,5 @@
-const CACHE = 'routesync-v12';
-const STATIC = ['./','./index.html','./manifest.json'];
+const CACHE = 'routesync-v13';
+const STATIC = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
