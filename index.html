@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3188,8 +3188,57 @@ function initShopPickerMap() {
     placeShopPin(e.latLng.lat(), e.latLng.lng(), true);
   });
 
+  // Add "Use My Location" button on map
+  const locBtn = document.createElement('button');
+  locBtn.innerHTML = '📍 Use My Location';
+  locBtn.style.cssText = `
+    position:absolute;
+    bottom:12px;left:50%;transform:translateX(-50%);
+    background:#FF6B00;color:#fff;
+    border:none;border-radius:20px;
+    padding:8px 18px;font-size:13px;font-weight:700;
+    cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.25);
+    z-index:10;white-space:nowrap;
+    font-family:'DM Sans',sans-serif;
+  `;
+  locBtn.onclick = useMyLocation;
+  document.getElementById('shopPickerMap').style.position = 'relative';
+  document.getElementById('shopPickerMap').appendChild(locBtn);
+
   // Set up address autocomplete
   setupAddressAutocomplete();
+
+  // Auto-detect location when map first opens
+  useMyLocation(true);
+}
+
+function useMyLocation(silent = false) {
+  if (!navigator.geolocation) {
+    if (!silent) showToast('❌ Geolocation not supported on this device', 'error');
+    return;
+  }
+  if (!silent) showToast('📡 Getting your location...', 'success');
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      if (shopPickerMap) {
+        shopPickerMap.setCenter({ lat, lng });
+        shopPickerMap.setZoom(17);
+      }
+      placeShopPin(lat, lng, true);
+      showToast('📍 Location captured!', 'success');
+    },
+    (err) => {
+      const msgs = {
+        1: '❌ Location permission denied. Please allow location access.',
+        2: '❌ Location unavailable. Try clicking on the map manually.',
+        3: '❌ Location request timed out. Try again.'
+      };
+      if (!silent) showToast(msgs[err.code] || '❌ Could not get location', 'error');
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
 }
 
 function placeShopPin(lat, lng, reverseGeocode = false) {
